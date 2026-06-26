@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecosistema Digital de Sistematización - Registro y Búsqueda</title>
+    <title>Ecosistema Digital de Sistematización - Consulta y Registro</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,10 +19,53 @@
             <p><strong>Conectando con el servidor en la nube:</strong> El sistema está preparando y cargando los datos. Si es la primera consulta del día, por favor espera aproximadamente 1 minuto mientras se reactiva la base de datos de forma segura.</p>
         </div>
 
-        <!-- Sección de Dos Columnas: Formulario y Búsqueda -->
+        <!-- Sección de Dos Columnas: Búsqueda Primero, Formulario Después -->
         <div class="dashboard-grid">
             
-            <!-- Columna Izquierda: Formulario de Registro (Campos Obligatorios) -->
+            <!-- SECCIÓN 1 (Prioritaria): Buscador Centralizado por Botón -->
+            <section class="search-panel-container">
+                <h2>Buscador Centralizado</h2>
+                <p class="section-desc">Ingrese el nombre o número de cédula del afectado y presione el botón para consultar.</p>
+                
+                <div class="search-controls">
+                    <div class="search-input-group">
+                        <input type="text" id="search-input" placeholder="Buscar por nombre o número de cédula...">
+                        <button type="button" id="search-btn" class="search-execute-btn">Buscar Persona</button>
+                    </div>
+                    
+                    <select id="center-filter">
+                        <option value="">Todos los Centros de Salud</option>
+                        <option value="Hospital Universitario de Caracas (HUC)">Hospital Universitario (HUC)</option>
+                        <option value="Cruz Roja">Cruz Roja</option>
+                        <option value="Periférico de Catia">Periférico de Catia</option>
+                        <option value="Hospital Domingo Luciani (El Llanito)">Hospital Domingo Luciani</option>
+                        <option value="Hospital Doctor Miguel Pérez Carreño">Hospital Pérez Carreño</option>
+                        <option value="Casos Especiales">Casos Especiales</option>
+                    </select>
+                </div>
+
+                <!-- Tabla Dinámica -->
+                <div class="table-responsive">
+                    <table id="patients-table">
+                        <thead>
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Identificación / Edad</th>
+                                <th>Procedencia</th>
+                                <th>Ubicación Actual</th>
+                                <th>Observaciones e Historial</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <tr>
+                                <td colspan="5" class="loading-text">Esperando respuesta del servidor en la nube...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 2: Formulario de Registro (Campos Obligatorios) -->
             <section class="form-panel">
                 <h2>Ingresar Registro al Sistema</h2>
                 <p class="section-desc">Utilice este módulo para reportar o añadir a una persona localizada.</p>
@@ -67,12 +110,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="form-nota">Notes de Registro / Observaciones:</label>
+                            <label for="form-nota">Notas de Registro / Observaciones:</label>
                             <textarea id="form-nota" rows="2" placeholder="Detalles relevantes de su localización o estado general..."></textarea>
                         </div>
                     </fieldset>
 
-                    <!-- BLOQUE B: CONSTANCIA OBLIGATORIA DEL REPORTANTE (Obligatorio para guardar) -->
+                    <!-- BLOQUE B: CONSTANCIA OBLIGATORIA DEL REPORTANTE -->
                     <fieldset class="form-section">
                         <legend>2. Constancia de Responsabilidad (Reportante) *</legend>
                         
@@ -104,58 +147,23 @@
                 <div id="form-response-message"></div>
             </section>
 
-            <!-- Columna Derecha: Buscador Centralizado por Botón -->
-            <section class="search-panel-container">
-                <h2>Buscador Centralizado</h2>
-                <p class="section-desc">Ingrese el nombre o número de cédula del afectado y presione el botón para consultar.</p>
-                
-                <div class="search-controls">
-                    <div class="search-input-group">
-                        <input type="text" id="search-input" placeholder="Buscar por nombre o número de cédula...">
-                        <button type="button" id="search-btn" class="search-execute-btn">Buscar Persona</button>
-                    </div>
-                    
-                    <select id="center-filter">
-                        <option value="">Todos los Centros de Salud</option>
-                        <option value="Hospital Universitario de Caracas (HUC)">Hospital Universitario (HUC)</option>
-                        <option value="Cruz Roja">Cruz Roja</option>
-                        <option value="Periférico de Catia">Periférico de Catia</option>
-                        <option value="Hospital Domingo Luciani (El Llanito)">Hospital Domingo Luciani</option>
-                        <option value="Hospital Doctor Miguel Pérez Carreño">Hospital Pérez Carreño</option>
-                        <option value="Casos Especiales">Casos Especiales</option>
-                    </select>
-                </div>
-
-                <!-- Tabla Dinámica -->
-                <div class="table-responsive">
-                    <table id="patients-table">
-                        <thead>
-                            <tr>
-                                <th>Paciente</th>
-                                <th>Identificación / Edad</th>
-                                <th>Procedencia</th>
-                                <th>Ubicación Actual</th>
-                                <th>Observaciones e Historial</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body">
-                            <tr>
-                                <td colspan="5" class="loading-text">Esperando respuesta del servidor en la nube...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
         </div>
 
-        <!-- Footer Exclusivamente Personal y Comunitario con Responsabilidad del Usuario -->
+        <!-- Nota de Feedback y Aporte del Desarrollador -->
+        <div class="developer-feedback-note" style="margin-top: 1.5rem; background-color: rgba(2, 132, 199, 0.04); border: 1px dashed rgba(2, 132, 199, 0.3); padding: 12px; border-radius: 8px; text-align: center;">
+            <p style="font-size: 0.8rem; color: #0369a1; font-weight: 500; line-height: 1.4;">
+                ℹ️ <strong>Nota Informativa:</strong> Este ecosistema digital ha sido desarrollado ad honorem con el único fin de aportar conocimientos técnicos al servicio del bienestar social y el apoyo humanitario comunitario. El sistema no almacena de forma automatizada credenciales institucionales de ninguna índole.
+            </p>
+        </div>
+
+        <!-- Footer Exclusivamente Personal y Comunitario -->
         <footer>
             <div class="footer-legal-notice">
-                <p><strong>Términos de Uso y Exoneración de Responsabilidad Legal:</strong> Este sistema constituye una herramienta tecnológica de carácter estrictamente personal, humanitario, voluntario, colaborativo y sin fines de lucro, diseñada con el único propósito de apoyar la localización y control informativo de pacientes en centros de salud. <strong>El uso de esta herramienta, así como el registro y la consulta de los datos aquí contenidos, se realiza bajo la única y exclusiva responsabilidad de la persona que la utiliza.</strong> Quienes administran y desarrollan esta plataforma actúan de estricta buena fe comunitaria y, bajo ningún concepto, se hacen responsables civil, penal o administrativamente por la exactitud, veracidad o alteraciones posteriores de los datos suministrados por los usuarios, ni por el uso indebido, fraudulento, no autorizado o ilegal que terceros puedan dar a la información desplegada, de conformidad con lo establecido en la Ley y el ordenamiento jurídico vigente de la República Bolivariana de Venezuela.</p>
+                <p><strong>Términos de Uso y Exoneración de Responsabilidad Legal:</strong> Este sistema constituye una herramienta tecnológica de carácter estrictamente personal, humanitario, voluntario, colaborativo y sin fines de lucro, diseñada con el único propósito de apoyar la localización y control informativo de pacientes en centros de salud[cite: 2]. <strong>El uso de esta herramienta, así como el registro y la consulta de los datos aquí contenidos, se realiza bajo la única y exclusiva responsabilidad de la persona que la utiliza.</strong> Quienes administran y desarrollan esta plataforma actúan de estricta buena fe comunitaria y, bajo ningún concepto, se hacen responsables civil, penal o administrativamente por la exactitud, veracidad o alteraciones posteriores de los datos suministrados por los usuarios, ni por el uso indebido, fraudulento, no autorizado o ilegal que terceros puedan dar a la información desplegada, de conformidad con lo establecido en la Ley y el ordenamiento jurídico vigente de la República Bolivariana de Venezuela[cite: 2].</p>
             </div>
             <p class="footer-copyright">&copy; Caracas - Venezuela 2026</p>
         </footer>
+    </div>
 
     <script>
         const API_URL = "http://127.0.0.1:5000/api/pacientes"; 
@@ -224,7 +232,6 @@
                 centro_salud: document.getElementById('form-centro').value,
                 nota_registro: document.getElementById('form-nota').value,
                 
-                // Estos campos viajan obligatoriamente gracias a la validación nativa del HTML5
                 reportante_nombre: document.getElementById('form-rep-nombre').value,
                 reportante_telefono: document.getElementById('form-rep-telefono').value,
                 reportante_condicion: document.getElementById('form-rep-condicion').value
