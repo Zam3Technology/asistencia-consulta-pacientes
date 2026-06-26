@@ -1,0 +1,399 @@
+/* ==========================================================================
+   1. VARIABLES GLOBALES Y CONFIGURACIÓN (Estilo Mica / Vidrio Esmerilado)
+   ========================================================================== */
+:root {
+    --bg-gradient: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    --panel-bg: rgba(255, 255, 255, 0.75);
+    --border-color: rgba(255, 255, 255, 0.6);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+    --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
+    
+    /* Paleta Institucional Ligeras */
+    --primary: #0284c7;
+    --primary-hover: #0369a1;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --success: #16a34a;
+    --error: #dc2626;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+    color: var(--text-main);
+    line-height: 1.5;
+    padding: 10px; /* Reducido para pantallas de celular pequeñas */
+}
+
+/* ==========================================================================
+   2. CONTENEDORES PRINCIPALES (Efecto Mica)
+   ========================================================================== */
+.mica-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--panel-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow-md);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+header h1 {
+    font-size: 1.5rem; /* Ajustado para celulares */
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.025em;
+}
+
+.subtitle {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* Alerta de carga del servidor */
+.status-alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: rgba(2, 132, 199, 0.08);
+    border: 1px solid rgba(2, 132, 199, 0.15);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    transition: opacity 0.5s ease;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(2, 132, 199, 0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   3. MALLA RESPONSIVA (Dashboard Grid)
+   ========================================================================== */
+/* Por defecto en celulares: Una sola columna vertical para evitar el amontonamiento */
+.dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-panel, .search-panel-container {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+}
+
+h2 {
+    font-size: 1.2rem;
+    color: #0f172a;
+    margin-bottom: 4px;
+}
+
+.section-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+}
+
+/* ==========================================================================
+   4. FORMULARIOS Y AGRUPACIONES
+   ========================================================================== */
+.form-section {
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 1rem;
+    background-color: rgba(248, 250, 252, 0.5);
+}
+
+.form-section legend {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 0 6px;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* En celulares, las filas de formulario se apilan para mejor lectura */
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="tel"],
+select,
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.9rem; /* Previene el zoom automático molesto en iOS Safari (mínimo 16px equivalente) */
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: var(--text-main);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none; /* Quita estilos por defecto de móviles */
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+/* Botón Principal de Envíos */
+button[type="submit"] {
+    width: 100%;
+    background-color: var(--primary);
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button[type="submit"]:hover { background-color: var(--primary-hover); }
+button[type="submit"]:disabled { background-color: #94a3b8; cursor: not-allowed; }
+
+/* Mensajes de feedback de transacciones */
+.success-msg, .error-msg {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+}
+.success-msg { background-color: rgba(22, 163, 74, 0.1); color: var(--success); }
+.error-msg { background-color: rgba(220, 38, 38, 0.1); color: var(--error); }
+
+/* ==========================================================================
+   5. BARRAS DE BÚSQUEDA BAJO DEMANDA
+   ========================================================================== */
+.search-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 1.25rem;
+}
+
+.search-input-group {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.search-input-group input {
+    flex: 1;
+}
+
+.search-execute-btn {
+    background-color: var(--primary);
+    color: #ffffff;
+    border: none;
+    padding: 0 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+}
+.search-execute-btn:hover { background-color: var(--primary-hover); }
+
+/* ==========================================================================
+   6. TABLA DINÁMICA Y ADAPTACIÓN MÓVIL (MÓDULO CRÍTICO)
+   ========================================================================== */
+/* Permite deslizamiento horizontal suave sin romper la Mica en pantallas pequeñas */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; 
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    background-color: #ffffff;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.85rem;
+    min-width: 600px; /* Obliga a mantener estructura coherente al deslizar en celular */
+}
+
+th, td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+}
+
+th {
+    background-color: #f8fafc;
+    font-weight: 700;
+    color: #475569;
+    white-space: nowrap;
+}
+
+.patient-name {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.patient-date {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.note-text {
+    font-size: 0.8rem;
+    color: #334155;
+    max-width: 220px;
+    word-wrap: break-word;
+}
+
+.loading-text {
+    text-align: center;
+    padding: 2rem !important;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Etiquetas Dinámicas de Hospitales */
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 4px;
+    white-space: normal; /* Permite saltos de línea si el nombre del hospital es largo en móvil */
+    max-width: 130px;
+}
+
+.badge-huc { background-color: #e0f2fe; color: #0369a1; }
+.badge-cr { background-color: #fee2e2; color: #b91c1c; }
+.badge-catia { background-color: #fef3c7; color: #b45309; }
+.badge-luciani { background-color: #dcfce7; color: #15803d; }
+.badge-pc { background-color: #f3e8ff; color: #6b21a8; }
+.badge-default { background-color: #f1f5f9; color: #475569; }
+
+/* ==========================================================================
+   7. FOOTER DE EXONERACIÓN PERSONAL
+   ========================================================================== */
+footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.footer-legal-notice {
+    max-width: 100%;
+    background-color: rgba(0, 0, 0, 0.015);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-align: justify;
+    margin-bottom: 1rem;
+}
+
+.footer-legal-notice p {
+    font-size: 0.74rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+}
+
+.footer-copyright {
+    font-size: 0.78rem;
+    color: #475569;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   8. MEDIA QUERIES (PANTALLAS GRANDES - COMPUTADORAS)
+   ========================================================================== */
+@media (min-width: 768px) {
+    body {
+        padding: 24px;
+    }
+    
+    .mica-container {
+        padding: 24px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    /* Activa las 2 columnas paralelas solo en pantallas medianas/grandes */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.3fr;
+        align-items: start;
+        gap: 1.5rem;
+    }
+    
+    .form-row {
+        flex-direction: row;
+        gap: 12px;
+    }
+    
+    .search-controls {
+        flex-direction: row;
+    }
+    
+    .search-controls select {
+        max-width: 220px;
+    }
+    
+    th, td {
+        padding: 12px 14px;
+    }
+}
