@@ -181,26 +181,36 @@
     }
 
     // 2. FUNCIÓN DE BÚSQUEDA (Independiente)
-    function ejecutarBusqueda() {
-        const query = document.getElementById('search-input').value.toLowerCase().trim();
-        const tbody = document.getElementById('table-body');
+function ejecutarBusqueda() {
+    const query = document.getElementById('search-input').value.toLowerCase().trim();
+    
+    // Esta función quita tildes y caracteres especiales
+    const normalizar = (texto) => {
+        return texto ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
+    };
+
+    const queryNormalizada = normalizar(query);
+    const tbody = document.getElementById('table-body');
+    
+    const resultados = listaPacientes.filter(p => {
+        const nombreNormalizado = normalizar(p.nombre || "");
+        const cedulaNormalizada = normalizar(p.cedula || "");
         
-        const resultados = listaPacientes.filter(p => 
-            (p.nombre?.toLowerCase().includes(query) || p.cedula?.toLowerCase().includes(query))
-        );
-        
-        tbody.innerHTML = resultados.length ? "" : "<tr><td colspan='5' style='text-align:center;'>No se encontraron resultados.</td></tr>";
-        
-        resultados.forEach(p => {
-            tbody.innerHTML += `<tr>
-                <td>${p.nombre || '-'}</td>
-                <td>${p.cedula || 'S/C'}</td>
-                <td>${p.procedencia || '-'}</td>
-                <td>${p.centro_salud || '-'}</td>
-                <td>${p.nota_registro || '-'}</td>
-            </tr>`;
-        });
-    }
+        return nombreNormalizado.includes(queryNormalizada) || cedulaNormalizada.includes(queryNormalizada);
+    });
+    
+    tbody.innerHTML = resultados.length ? "" : "<tr><td colspan='5' style='text-align:center;'>No se encontraron resultados.</td></tr>";
+    
+    resultados.forEach(p => {
+        tbody.innerHTML += `<tr>
+            <td>${p.nombre || '-'}</td>
+            <td>${p.cedula || 'S/C'}</td>
+            <td>${p.procedencia || '-'}</td>
+            <td>${p.centro_salud || '-'}</td>
+            <td>${p.nota_registro || '-'}</td>
+        </tr>`;
+    });
+}
 
     // 3. EVENTOS (Aquí es donde se activa todo)
     document.addEventListener('DOMContentLoaded', async () => {
