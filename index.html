@@ -169,33 +169,50 @@
     const API_URL = "https://asistencia-consulta-pacientes.onrender.com/api/pacientes";
     let listaPacientes = [];
 
-    async function iniciarSistema() {
-        // Carga inicial
+    // 1. FUNCIÓN PARA OBTENER DATOS (La base de todo)
+    async function obtenerDatos() {
         try {
             const response = await fetch(API_URL);
             listaPacientes = await response.json();
             document.getElementById('server-status-alert').style.display = 'none';
         } catch (error) {
-            console.error("Error de carga:", error);
+            console.error("Error al cargar datos:", error);
         }
+    }
 
-        // Evento Buscador
-        document.getElementById('search-btn').addEventListener('click', () => {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const resultados = listaPacientes.filter(p => 
-                (p.nombre?.toLowerCase().includes(query) || p.cedula?.toLowerCase().includes(query))
-            );
-            
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = resultados.length ? "" : "<tr><td colspan='5'>No hay resultados.</td></tr>";
-            resultados.forEach(p => {
-                tbody.innerHTML += `<tr><td>${p.nombre}</td><td>${p.cedula}</td><td>${p.procedencia}</td><td>${p.centro_salud}</td><td>${p.nota_registro || '-'}</td></tr>`;
-            });
+    // 2. FUNCIÓN DE BÚSQUEDA (Independiente)
+    function ejecutarBusqueda() {
+        const query = document.getElementById('search-input').value.toLowerCase().trim();
+        const tbody = document.getElementById('table-body');
+        
+        const resultados = listaPacientes.filter(p => 
+            (p.nombre?.toLowerCase().includes(query) || p.cedula?.toLowerCase().includes(query))
+        );
+        
+        tbody.innerHTML = resultados.length ? "" : "<tr><td colspan='5' style='text-align:center;'>No se encontraron resultados.</td></tr>";
+        
+        resultados.forEach(p => {
+            tbody.innerHTML += `<tr>
+                <td>${p.nombre || '-'}</td>
+                <td>${p.cedula || 'S/C'}</td>
+                <td>${p.procedencia || '-'}</td>
+                <td>${p.centro_salud || '-'}</td>
+                <td>${p.nota_registro || '-'}</td>
+            </tr>`;
         });
+    }
 
-        // Evento Formulario
+    // 3. EVENTOS (Aquí es donde se activa todo)
+    document.addEventListener('DOMContentLoaded', async () => {
+        await obtenerDatos(); // Cargar primero
+        
+        // Asignar evento al buscador
+        document.getElementById('search-btn').addEventListener('click', ejecutarBusqueda);
+
+        // Asignar evento al formulario
         document.getElementById('patient-form').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             const data = {
                 nombre: document.getElementById('form-nombre').value,
                 cedula: document.getElementById('form-cedula').value,
@@ -214,20 +231,19 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
+                
                 if (res.ok) {
-                    document.getElementById('form-response-message').innerHTML = "<p style='color:green;'>Guardado con éxito.</p>";
+                    document.getElementById('form-response-message').innerHTML = "<p style='color:green;'>¡Guardado exitosamente!</p>";
                     document.getElementById('patient-form').reset();
-                    iniciarSistema(); // Recarga la lista
+                    await obtenerDatos(); // Actualiza la lista en memoria tras guardar
                 } else {
                     document.getElementById('form-response-message').innerHTML = "<p style='color:red;'>Error al guardar.</p>";
                 }
             } catch (err) {
-                document.getElementById('form-response-message').innerHTML = "<p style='color:red;'>Error de red.</p>";
+                document.getElementById('form-response-message').innerHTML = "<p style='color:red;'>Error de conexión.</p>";
             }
         });
-    }
-
-    window.addEventListener('DOMContentLoaded', iniciarSistema);
+    });
 </script>
 </body>
 </html>
