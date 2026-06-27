@@ -166,148 +166,75 @@
     </div>
 
     <script>
-        // CAMBIA ESTA LÍNEA
         const API_URL = "https://asistencia-consulta-pacientes.onrender.com/api/pacientes";
+
+        // Variable global para almacenar pacientes
+        let listaPacientes = [];
 
         async function cargarPacientes() {
             const statusAlert = document.getElementById('server-status-alert');
             try {
                 const response = await fetch(API_URL);
-                const pacientes = await response.json();
+                listaPacientes = await response.json(); // Cargamos en memoria pero NO mostramos
                 
                 statusAlert.style.opacity = '0';
                 setTimeout(() => statusAlert.style.display = 'none', 500);
 
-                const tableBody = document.getElementById('table-body');
-                tableBody.innerHTML = '';
+                // Inicializamos la tabla vacía
+                document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="text-align:center;">Sistema listo. Realice una búsqueda para consultar datos.</td></tr>`;
 
-                if(pacientes.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 2rem;">No existen registros en la base de datos actualmente.</td></tr>`;
-                    return;
-                }
-
-                pacientes.forEach(p => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>
-                            <div class="patient-name">${p.nombre || '-'}</div>
-                            <div class="patient-date">Registrado: ${p.fecha_registro || '-'}</div>
-                        </td>
-                        <td>
-                            <div><strong>Cédula:</strong> ${p.cedula || 'S/C'}</div>
-                            <div><strong>Edad:</strong> ${p.edad ? p.edad + ' años' : 'No indicada'}</div>
-                        </td>
-                        <td>${p.procedencia || '-'}</td>
-                        <td><span class="badge ${obtenerClaseBadge(p.centro_salud)}">${p.centro_salud || '-'}</span></td>
-                        <td class="note-text">
-                            ${p.nota_registro || '-'}
-                            <div style="margin-top: 5px; font-size: 0.78rem; color: #0284c7; font-weight: 500;">
-                                👤 Origen: ${p.reportante_condicion || 'Civil'}
-                            </div>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-
-                configurarBuscador(pacientes);
+                configurarBuscador();
 
             } catch (error) {
-                console.error("Error:", error);
-                document.getElementById('table-body').innerHTML = `
-                    <tr><td colspan="5" style="text-align:center; color: #b91c1c; padding: 2rem; font-weight: bold;">
-                        Error de vinculación. El servidor de datos sigue iniciando o está apagado.
-                    </td></tr>`;
+                document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="text-align:center; color: #b91c1c;">Error de conexión con el servidor.</td></tr>`;
             }
         }
 
-        document.getElementById('patient-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtn = document.getElementById('submit-btn');
-            const msgContainer = document.getElementById('form-response-message');
-
-            const nuevoPaciente = {
-                nombre: document.getElementById('form-nombre').value,
-                cedula: document.getElementById('form-cedula').value,
-                edad: document.getElementById('form-edad').value,
-                procedencia: document.getElementById('form-procedencia').value,
-                centro_salud: document.getElementById('form-centro').value,
-                nota_registro: document.getElementById('form-nota').value,
-                
-                reportante_nombre: document.getElementById('form-rep-nombre').value,
-                reportante_telefono: document.getElementById('form-rep-telefono').value,
-                reportante_condicion: document.getElementById('form-rep-condicion').value
-            };
-
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Procesando e insertando...";
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(nuevoPaciente)
-                });
-
-                if(response.ok) {
-                    msgContainer.innerHTML = `<p class="success-msg">✓ Registro integrado al sistema exitosamente.</p>`;
-                    document.getElementById('patient-form').reset();
-                    cargarPacientes();
-                } else {
-                    msgContainer.innerHTML = `<p class="error-msg">⚠️ No se pudo procesar el guardado. Verifique el backend.</p>`;
-                }
-            } catch (error) {
-                msgContainer.innerHTML = `<p class="error-msg">⚠️ Error de red. El servidor de almacenamiento no responde.</p>`;
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Agregar al Sistema de Datos";
-                setTimeout(() => msgContainer.innerHTML = '', 5000);
-            }
-        });
-
-        function obtenerClaseBadge(centro) {
-            if (!centro) return 'badge-default';
-            if (centro.includes('HUC')) return 'badge-huc';
-            if (centro.includes('Cruz Roja')) return 'badge-cr';
-            if (centro.includes('Catia')) return 'badge-catia';
-            if (centro.includes('Luciani')) return 'badge-luciani';
-            if (centro.includes('Pérez Carreño')) return 'badge-pc';
-            return 'badge-default';
-        }
-
-        function configurarBuscador(pacientes) {
+        function configurarBuscador() {
             const searchInput = document.getElementById('search-input');
             const centerFilter = document.getElementById('center-filter');
             const searchBtn = document.getElementById('search-btn');
-            const tableRows = document.querySelectorAll('#table-body tr');
+            const tableBody = document.getElementById('table-body');
 
-            function filtrar() {
+            function realizarBusqueda() {
                 const query = searchInput.value.toLowerCase().trim();
                 const filterCenter = centerFilter.value;
 
-                tableRows.forEach((row, index) => {
-                    const p = pacientes[index];
-                    if(!p) return;
+                // Si no hay búsqueda, no mostramos nada
+                if (query === "" && filterCenter === "") {
+                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Ingrese criterios de búsqueda para mostrar resultados.</td></tr>`;
+                    return;
+                }
 
-                    const matchesSearch = 
-                        p.nombre?.toLowerCase().includes(query) || 
-                        p.cedula?.toLowerCase().includes(query) || 
-                        p.procedencia?.toLowerCase().includes(query);
-                    
+                // Filtrar datos en memoria
+                const resultados = listaPacientes.filter(p => {
+                    const matchesSearch = p.nombre?.toLowerCase().includes(query) || 
+                                          p.cedula?.toLowerCase().includes(query) || 
+                                          p.procedencia?.toLowerCase().includes(query);
                     const matchesCenter = filterCenter === "" || p.centro_salud === filterCenter;
-
-                    if (matchesSearch && matchesCenter) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
+                    return matchesSearch && matchesCenter;
                 });
+
+                // Mostrar resultados
+                tableBody.innerHTML = '';
+                if (resultados.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No se encontraron coincidencias.</td></tr>`;
+                } else {
+                    resultados.forEach(p => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${p.nombre || '-'} <br><small>Registrado: ${p.fecha_registro || '-'}</small></td>
+                            <td>${p.cedula || 'S/C'} / ${p.edad || '-'}</td>
+                            <td>${p.procedencia || '-'}</td>
+                            <td><span class="badge">${p.centro_salud || '-'}</span></td>
+                            <td>${p.nota_registro || '-'} <br><small>👤 ${p.reportante_condicion || 'Civil'}</small></td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
             }
 
-            searchBtn.addEventListener('click', filtrar);
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') filtrar();
-            });
-            centerFilter.addEventListener('change', filtrar);
+            searchBtn.addEventListener('click', realizarBusqueda);
         }
 
         window.addEventListener('DOMContentLoaded', cargarPacientes);
