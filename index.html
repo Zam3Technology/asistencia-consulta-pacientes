@@ -166,78 +166,68 @@
     </div>
 
     <script>
-        const API_URL = "https://asistencia-consulta-pacientes.onrender.com/api/pacientes";
+    const API_URL = "https://asistencia-consulta-pacientes.onrender.com/api/pacientes";
+    let listaPacientes = [];
 
-        // Variable global para almacenar pacientes
-        let listaPacientes = [];
+    async function iniciarSistema() {
+        // Carga inicial
+        try {
+            const response = await fetch(API_URL);
+            listaPacientes = await response.json();
+            document.getElementById('server-status-alert').style.display = 'none';
+        } catch (error) {
+            console.error("Error de carga:", error);
+        }
 
-        async function cargarPacientes() {
-            const statusAlert = document.getElementById('server-status-alert');
+        // Evento Buscador
+        document.getElementById('search-btn').addEventListener('click', () => {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const resultados = listaPacientes.filter(p => 
+                (p.nombre?.toLowerCase().includes(query) || p.cedula?.toLowerCase().includes(query))
+            );
+            
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = resultados.length ? "" : "<tr><td colspan='5'>No hay resultados.</td></tr>";
+            resultados.forEach(p => {
+                tbody.innerHTML += `<tr><td>${p.nombre}</td><td>${p.cedula}</td><td>${p.procedencia}</td><td>${p.centro_salud}</td><td>${p.nota_registro || '-'}</td></tr>`;
+            });
+        });
+
+        // Evento Formulario
+        document.getElementById('patient-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = {
+                nombre: document.getElementById('form-nombre').value,
+                cedula: document.getElementById('form-cedula').value,
+                edad: document.getElementById('form-edad').value,
+                procedencia: document.getElementById('form-procedencia').value,
+                centro_salud: document.getElementById('form-centro').value,
+                nota_registro: document.getElementById('form-nota').value,
+                reportante_nombre: document.getElementById('form-rep-nombre').value,
+                reportante_telefono: document.getElementById('form-rep-telefono').value,
+                reportante_condicion: document.getElementById('form-rep-condicion').value
+            };
+
             try {
-                const response = await fetch(API_URL);
-                listaPacientes = await response.json(); // Cargamos en memoria pero NO mostramos
-                
-                statusAlert.style.opacity = '0';
-                setTimeout(() => statusAlert.style.display = 'none', 500);
-
-                // Inicializamos la tabla vacía
-                document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="text-align:center;">Sistema listo. Realice una búsqueda para consultar datos.</td></tr>`;
-
-                configurarBuscador();
-
-            } catch (error) {
-                document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="text-align:center; color: #b91c1c;">Error de conexión con el servidor.</td></tr>`;
-            }
-        }
-
-        function configurarBuscador() {
-            const searchInput = document.getElementById('search-input');
-            const centerFilter = document.getElementById('center-filter');
-            const searchBtn = document.getElementById('search-btn');
-            const tableBody = document.getElementById('table-body');
-
-            function realizarBusqueda() {
-                const query = searchInput.value.toLowerCase().trim();
-                const filterCenter = centerFilter.value;
-
-                // Si no hay búsqueda, no mostramos nada
-                if (query === "" && filterCenter === "") {
-                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Ingrese criterios de búsqueda para mostrar resultados.</td></tr>`;
-                    return;
-                }
-
-                // Filtrar datos en memoria
-                const resultados = listaPacientes.filter(p => {
-                    const matchesSearch = p.nombre?.toLowerCase().includes(query) || 
-                                          p.cedula?.toLowerCase().includes(query) || 
-                                          p.procedencia?.toLowerCase().includes(query);
-                    const matchesCenter = filterCenter === "" || p.centro_salud === filterCenter;
-                    return matchesSearch && matchesCenter;
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
                 });
-
-                // Mostrar resultados
-                tableBody.innerHTML = '';
-                if (resultados.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No se encontraron coincidencias.</td></tr>`;
+                if (res.ok) {
+                    document.getElementById('form-response-message').innerHTML = "<p style='color:green;'>Guardado con éxito.</p>";
+                    document.getElementById('patient-form').reset();
+                    iniciarSistema(); // Recarga la lista
                 } else {
-                    resultados.forEach(p => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${p.nombre || '-'} <br><small>Registrado: ${p.fecha_registro || '-'}</small></td>
-                            <td>${p.cedula || 'S/C'} / ${p.edad || '-'}</td>
-                            <td>${p.procedencia || '-'}</td>
-                            <td><span class="badge">${p.centro_salud || '-'}</span></td>
-                            <td>${p.nota_registro || '-'} <br><small>👤 ${p.reportante_condicion || 'Civil'}</small></td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
+                    document.getElementById('form-response-message').innerHTML = "<p style='color:red;'>Error al guardar.</p>";
                 }
+            } catch (err) {
+                document.getElementById('form-response-message').innerHTML = "<p style='color:red;'>Error de red.</p>";
             }
+        });
+    }
 
-            searchBtn.addEventListener('click', realizarBusqueda);
-        }
-
-        window.addEventListener('DOMContentLoaded', cargarPacientes);
-    </script>
+    window.addEventListener('DOMContentLoaded', iniciarSistema);
+</script>
 </body>
 </html>
