@@ -5,7 +5,7 @@ import datetime
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "https://zam3technology.github.io"}})
 
 # 🔒 VULNERABILIDAD CERO: Render leerá la credencial de forma segura desde su entorno
 # Si no la encuentra, usará una cadena vacía por seguridad.
