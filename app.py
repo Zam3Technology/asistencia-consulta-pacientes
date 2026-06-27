@@ -7,14 +7,18 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Vinculación segura con tu Base de Datos de MongoDB Atlas
-MONGO_URI = "mongodb+srv://tu_usuario:tu_contraseña@cluster0.xxxx.mongodb.net/?retryWrites=true&w=majority"
+# 🔒 VULNERABILIDAD CERO: Render leerá la credencial de forma segura desde su entorno
+# Si no la encuentra, usará una cadena vacía por seguridad.
+MONGO_URI = os.environ.get("MONGO_DATABASE_URL", "")
 
 try:
-    client = MongoClient(MONGO_URI)
-    db = client["sistema_busqueda"]
-    collection = db["pacientes"]
-    print("Enlace exitoso con el clúster de MongoDB Atlas.")
+    if MONGO_URI:
+        client = MongoClient(MONGO_URI)
+        db = client["sistema_busqueda"]
+        collection = db["pacientes"]
+        print("Enlace seguro y exitoso con el clúster de MongoDB Atlas.")
+    else:
+        print("Alerta: No se detectó la variable de entorno MONGO_DATABASE_URL.")
 except Exception as e:
     print(f"Alerta de conexión fallida: {e}")
 
@@ -35,7 +39,7 @@ def agregar_paciente():
         campos_obligatorios = ['nombre', 'procedencia', 'reportante_nombre', 'reportante_telefono', 'reportante_condicion']
         for campo in campos_obligatorios:
             if not datos_recibidos.get(campo):
-                return jsonify({"error": f"El campo {campo} es estrictamente obligatorio para la auditoría jurídica del sistema"}), 400
+                return jsonify({"error": f"El campo {campo} es estrictamente obligatorio para la auditoría del sistema"}), 400
         
         fecha_actual = datetime.datetime.now().strftime("%Y-%m-%d")
         
@@ -50,7 +54,7 @@ def agregar_paciente():
             "nota_registro": datos_recibidos.get('nota_registro', '').strip(),
             "fecha_registro": fecha_actual,
             
-            # Constancia legal de origen (Trazabilidad)
+            # Constancia de origen (Trazabilidad)
             "reportante_nombre": datos_recibidos.get('reportante_nombre').strip(),
             "reportante_telefono": datos_recibidos.get('reportante_telefono').strip(),
             "reportante_condicion": datos_recibidos.get('reportante_condicion').strip()
@@ -64,4 +68,4 @@ def agregar_paciente():
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False) # debug=False para producción segura
