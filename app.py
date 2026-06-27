@@ -42,10 +42,11 @@ def agregar_paciente():
     try:
         datos_recibidos = request.get_json()
         
-        # Validaciones de seguridad
-        campos_obligatorios = ['nombre', 'procedencia', 'reportante_nombre', 'reportante_telefono', 'reportante_condicion']
+        # Cambia tu validación por esta para ver qué pasa:
         for campo in campos_obligatorios:
-            if not datos_recibidos.get(campo):
+            valor = datos_recibidos.get(campo)
+            if not valor:
+                print(f"DEBUG: El campo '{campo}' llegó como: {valor}") # Esto saldrá en los logs de Render
                 return jsonify({"error": f"El campo {campo} es estrictamente obligatorio"}), 400
         
         fecha_actual = datetime.datetime.now().strftime("%Y-%m-%d")
