@@ -40,16 +40,22 @@ def agregar_paciente():
         return jsonify({"error": "Base de datos no conectada"}), 500
     
     try:
-        datos_recibidos = request.get_json()
+        datos = request.get_json()
         
-        # Cambia tu validación por esta para ver qué pasa:
-        for campo in campos_obligatorios:
-            valor = datos_recibidos.get(campo)
-            if not valor:
-                print(f"DEBUG: El campo '{campo}' llegó como: {valor}") # Esto saldrá en los logs de Render
-                return jsonify({"error": f"El campo {campo} es estrictamente obligatorio"}), 400
+        # Flexibilizamos: solo exigimos lo mínimo necesario para que guarde
+        if not datos.get('nombre'):
+            return jsonify({"error": "El nombre es obligatorio"}), 400
         
-        fecha_actual = datetime.datetime.now().strftime("%Y-%m-%d")
+        # Agregamos fecha automáticamente si no viene
+        if 'fecha_registro' not in datos:
+            datos['fecha_registro'] = datetime.datetime.now().strftime("%Y-%m-%d")
+            
+        collection.insert_one(datos)
+        return jsonify({"mensaje": "Guardado exitoso"}), 201
+        
+    except Exception as e:
+        print(f"Error al guardar: {e}") # Mira este error en los Logs de Render
+        return jsonify({"error": str(e)}), 500
         
         # Estructura del documento
         nuevo_documento = {
